@@ -27,15 +27,8 @@ COLUMNS = ['Open_time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close_time', 
 #   ]
 # ]
 # defining key/request url
-key = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=1000"
-  
-# requesting data from url
-data = requests.get(key)  
-js = data.json()
-out = json.dumps(js, indent=4)
-
-with open("../data/all_data.json", "w") as outfile:
-    outfile.write(out)
+f = open("../data/all_data.json")
+js = json.load(f)
 
 df = pd.DataFrame(js, columns=COLUMNS)
 df.set_index('Open_time')
@@ -51,4 +44,4 @@ df["Close"] = df["Close"].astype("float")
 print(df)
 df.index = pd.DatetimeIndex(df['Open_time'])
 
-mpl.plot(df,type='candle', style='charles', savefig='../plots/week.png')
+mpl.plot(df,type='candle', style='charles', savefig='../plots/weeks.png')
