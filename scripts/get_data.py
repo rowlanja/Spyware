@@ -21,4 +21,4 @@ out = json.dumps(js, indent=4)
 with open("../data/all_data.json", "w") as outfile:
     outfile.write(out)
 
-
+  
