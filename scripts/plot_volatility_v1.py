@@ -30,27 +30,28 @@ COLUMNS = ['Open_time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close_time', 
 # ]
 # defining key/request url
 
-
+WINDOW_SIZE = 250
 def get_data():
-    f = open("../data/all_data.json")
+    f = open("data/all_data.json")
     js = json.load(f)
 
     df = pd.DataFrame(js, columns=COLUMNS)
     df.set_index('Open_time')
 
-    df = df.loc[0:100,['Open_time','Open', 'High', 'Low', 'Close']]
+    df = df.loc[len(df)-WINDOW_SIZE:,['Open_time','Open', 'High', 'Low', 'Close']]
 
     df['Open_time']=(pd.to_datetime(df['Open_time'],unit='ms')) 
     df["Open"] = df["Open"].astype("float")
     df["High"] = df["High"].astype("float")
     df["Low"] = df["Low"].astype("float")
     df["Close"] = df["Close"].astype("float")
+    df.index = np.arange(len(df))
     return df
 
-def get_rate_of_changes(values):
-    prev_val = values[0]
+def calculate_differential(values):
+    prev_val = values[len(values)-WINDOW_SIZE]
     rates = []
-    x = np.array(range(0, 100))
+    x = np.array(range(0, WINDOW_SIZE-1))
     for current_val in values[1:]:
         change = current_val - prev_val
         prev_val = current_val
@@ -63,11 +64,11 @@ def get_rate_of_changes(values):
     plt.ylabel("Y axis")
     plt.plot(x, y, color = "red", marker = "o", label = "Array elements")
     plt.legend()
-    plt.savefig("../plots/change.png")
+    plt.savefig("plots/change.png")
     return rates
 
 
-def quantize_changes(df, tolerance=0.25):
+def quantize_differential(df, tolerance=0.25):
     # df: DataFrame with only the column(s) to quantize
     model = AgglomerativeClustering(distance_threshold=2 * tolerance, linkage='complete',
                                     n_clusters=None).fit(df)
@@ -91,15 +92,14 @@ def form_quantized_frame(quant_df, price_df):
     )
     return df
 
-def plot_quantized_changes(df):
-    hlinessupp = df[df['change'] > 0.5]
-    hlinesres = df[df['change'] < -0.5]
-    hlines = []
-    colors = []
-    for r in hlinessupp.to_numpy().tolist():
+def plot(df):
+    hlinessupp = df[df['change'] > 0.5].to_numpy().tolist()
+    hlinesres = df[df['change'] < -0.5].to_numpy().tolist()
+    hlines, colors = [], []
+    for r in hlinessupp:
         hlines.append((r[2]))
         colors.append('g')
-    for r in hlinesres.to_numpy().tolist():
+    for r in hlinesres:
         hlines.append((r[2]))
         colors.append('b')
 
@@ -107,16 +107,14 @@ def plot_quantized_changes(df):
     mpl.plot(df,
         type='candle', 
         style='binance', 
-        savefig='../plots/volatility_step_in.png',
+        savefig='plots/volatility_step_in.png',
         hlines= dict(hlines=hlines,linestyle=['-'],linewidths = [2],colors=colors)
     )
 
-# hlines=dict(hlines= support_resistance,linestyle='-',linewidths = (1,1),colors=('b','r')
-
-# Convert array of integers to pandas series
-df = get_data()
-get_moving_averages(df)
-chg = get_rate_of_changes(df.Open)
-quantized_changes = quantize_changes(pd.DataFrame(chg))
-form_quantized_frame = form_quantized_frame(quantized_changes, df)
-plot_quantized_changes(form_quantized_frame)
+def plot_differentials():
+    # Convert array of integers to pandas series
+    df = get_data()
+    chg = calculate_differential(df.Open)
+    quantized_changes = quantize_differential(pd.DataFrame(chg))
+    form_frame = form_quantized_frame(quantized_changes, df)
+    plot(form_frame)
