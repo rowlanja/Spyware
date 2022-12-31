@@ -93,8 +93,8 @@ def form_quantized_frame(quant_df, price_df):
     return df
 
 def plot(df):
-    hlinessupp = df[df['change'] > 0.5].to_numpy().tolist()
-    hlinesres = df[df['change'] < -0.5].to_numpy().tolist()
+    hlinessupp = df[df['change'] > 1.0].to_numpy().tolist()
+    hlinesres = df[df['change'] < -1.0].to_numpy().tolist()
     hlines, colors = [], []
     for r in hlinessupp:
         hlines.append((r[2]))
