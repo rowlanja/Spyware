@@ -1,29 +1,8 @@
-
-# Import libraries
-import json
-import requests
-import pandas as pd
-import mplfinance as mpl
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-import datetime
 import time
 import pandas as pd
 from binance.client import Client
-import get_frameselect
-  
-def save_data(key):
-    COLUMNS = ['Open_time', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close_time', 'quote_av', 'trades',
-               'tb_base_av', 'tb_quote_av', 'ignore']
-    # defining key/request url
-    
-    # requesting data from url
-    data = requests.get(key)  
-    js = data.json()
-    out = json.dumps(js, indent=4)
+import frameselect
 
-    with open("data/all_data.json", "w") as outfile:
-        outfile.write(out)
 
 class BinanceTicker:
     def __init__(self, ticker_binance, time_frame_binance):
@@ -98,7 +77,7 @@ print("Example input: BTCUSDT 1W, ETHBTC 3D, BNBUSDT 1H, ATOMUSDT 15M")
 print("Ticker and Time Frame: ")
 ticker, frame_s = str(input().upper()).split()
 binance_api_runtime = time.perf_counter()
-time_frame, start = get_frameselect.frame_select(frame_s)
+time_frame, start = frameselect.frame_select(frame_s)
 user_ticker = BinanceTicker(ticker, time_frame)
 user_ticker.check_pair(ticker)
 print(
@@ -106,4 +85,3 @@ print(
     time.perf_counter() - binance_api_runtime,
     "seconds",
 )
-
