@@ -11,7 +11,7 @@ class BinanceTicker:
         # If you are living in the US, you need to use the binance.us API
         # self.client = Client("", "", tld="us")
         self.client = Client("", "", tld="com")
-        self.file_name = ticker + ".csv"
+        self.file_name = ticker + "-" + time_frame_binance + "-" + ".csv"
         self.header_list = [
             "unix",
             "open",
@@ -47,7 +47,7 @@ class BinanceTicker:
         """
         df = pd.DataFrame(
             reversed(
-                user_ticker.client.get_historical_klines(
+                self.client.get_historical_klines(
                     symbol=self.ticker, interval=self.time_frame, start_str=start
                 )
             ),
@@ -77,9 +77,22 @@ print("Example input: BTCUSDT 1W, ETHBTC 3D, BNBUSDT 1H, ATOMUSDT 15M")
 print("Ticker and Time Frame: ")
 ticker, frame_s = str(input().upper()).split()
 binance_api_runtime = time.perf_counter()
-time_frame, start = frameselect.frame_select(frame_s)
+
+time_frame, start = frameselect.frame_select("15M")
+med_time_frame, start = frameselect.frame_select("1H")
+low_time_frame, start = frameselect.frame_select("4H")
+
 user_ticker = BinanceTicker(ticker, time_frame)
+user_ticker_mtf = BinanceTicker(ticker, med_time_frame)
+user_ticker_ltf = BinanceTicker(ticker, low_time_frame)
+
+
 user_ticker.check_pair(ticker)
+
+user_ticker.historical_data_write()
+user_ticker_mtf.historical_data_write()
+user_ticker_ltf.historical_data_write()
+
 print(
     "Binance API historical data runtime: ",
     time.perf_counter() - binance_api_runtime,

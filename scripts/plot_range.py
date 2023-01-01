@@ -514,13 +514,15 @@ class Supres(Values):
             """
             Saves the image and html file of the plotly chart, then it tweets the image and text
             """
+
+            print("selected_timeframe : ", selected_timeframe)
             if not os.path.exists("../images"):
                 print(" status : ", os.path.exists("images"))
                 os.mkdir("../images")
             image = (
                 f"../images/"
                 f"{df['date'].dt.strftime('%b-%d-%y')[candle_count]}"
-                f"{historical_data.ticker}.jpeg"
+                f"{historical_data.ticker + '-' + selected_timeframe}.jpeg"
             )
             fig.write_image(image, width=1920, height=1080)  # Save image for tweet
             fig.write_html(
@@ -594,15 +596,28 @@ class Supres(Values):
 if __name__ == "__main__":
     # os.chdir("../")  # Change the directory to the main_supres folder
     file_name = historical_data.user_ticker.file_name
+    file_name_mtf = historical_data.user_ticker_mtf.file_name
+    file_name_ltf = historical_data.user_ticker_ltf.file_name
+    print("files : ", file_name, file_name_mtf, file_name_ltf)
     try:
         perf = time.perf_counter()
-        historical_data.user_ticker.historical_data_write()
         if os.path.isfile(file_name):  # Check .csv file exists
             print(f"{file_name} downloaded and created.")
             Supres.main(file_name, historical_data.time_frame)
+            Supres.main(file_name_mtf, historical_data.med_time_frame)
+            Supres.main(file_name_ltf, historical_data.low_time_frame)
+
             print("Data analysis is done. Browser opening.")
+
             os.remove(file_name)  # remove the .csv file
             print(f"{file_name} file deleted.")
+
+            os.remove(file_name_mtf)  # remove the .csv file
+            print(f"{file_name_mtf} file deleted.")
+
+            os.remove(file_name_ltf)  # remove the .csv file
+            print(f"{file_name_ltf} file deleted.")
+
         else:
             raise print(
                 "One or more issues caused the download to fail. "
