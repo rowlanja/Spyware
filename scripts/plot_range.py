@@ -515,10 +515,9 @@ class Supres(Values):
             Saves the image and html file of the plotly chart, then it tweets the image and text
             """
 
-            print("selected_timeframe : ", selected_timeframe)
             if not os.path.exists("../images"):
-                print(" status : ", os.path.exists("images"))
                 os.mkdir("../images")
+
             image = (
                 f"../images/"
                 f"{df['date'].dt.strftime('%b-%d-%y')[candle_count]}"
@@ -527,10 +526,13 @@ class Supres(Values):
             fig.write_image(image, width=1920, height=1080)  # Save image for tweet
             fig.write_html(
                 f"../images/"
-                f"{df['date'].dt.strftime('%b-%d-%y')[candle_count]}{historical_data.ticker}.html",
+                f"{df['date'].dt.strftime('%b-%d-%y')[candle_count]}{historical_data.ticker + selected_timeframe}.html",
                 full_html=False,
                 include_plotlyjs="cdn",
             )
+            with open('../templates/all_charts.html', 'a') as f:
+                f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
+
             text_image = (
                 f"#{historical_data.ticker} "
                 f"{selected_timeframe} Support and resistance levels \n "
