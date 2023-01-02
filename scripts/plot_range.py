@@ -602,6 +602,8 @@ if __name__ == "__main__":
     file_name_ltf = historical_data.user_ticker_ltf.file_name
     print("files : ", file_name, file_name_mtf, file_name_ltf)
     try:
+        result = os.remove('../templates/all_charts.html')
+        print(result)   
         perf = time.perf_counter()
         if os.path.isfile(file_name):  # Check .csv file exists
             print(f"{file_name} downloaded and created.")
@@ -619,6 +621,7 @@ if __name__ == "__main__":
 
             os.remove(file_name_ltf)  # remove the .csv file
             print(f"{file_name_ltf} file deleted.")
+
 
         else:
             raise print(
