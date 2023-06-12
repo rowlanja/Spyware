@@ -74,8 +74,7 @@ class BinanceTicker:
 
 # Example input:"BTCUSDT 1H", "ETHBTC 3D", "BNBUSDT 15M"
 print("Example input: BTCUSDT 1W, ETHBTC 3D, BNBUSDT 1H, ATOMUSDT 15M")
-print("Ticker and Time Frame: ")
-ticker = str(input().upper())
+ticker = "BTCUSDT"
 binance_api_runtime = time.perf_counter()
 
 time_frame, start = frameselect.frame_select("15M")
@@ -98,3 +97,6 @@ print(
     time.perf_counter() - binance_api_runtime,
     "seconds",
 )
+
+
+tickers = ['btcusdt', 'atomusdt', 'peopleusdt', 'dydxusdt' ]

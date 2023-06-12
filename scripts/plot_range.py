@@ -144,6 +144,7 @@ class Supres(Values):
             # support_below. If it isn't, it is appending it to the list resistance_below.
             all_support_list = tuple(map(lambda sup1: sup1[1], support_list))
             all_resistance_list = tuple(map(lambda res1: res1[1], resistance_list))
+            print(all_support_list, all_resistance_list)
             latest_close = df["close"].iloc[-1]
             for support_line in all_support_list:  # Find closes
                 if support_line < latest_close:
@@ -531,7 +532,10 @@ class Supres(Values):
                 include_plotlyjs="cdn",
             )
             with open('../templates/all_charts.html', 'a') as f:
+                f.write('''<button class="accordion">''' + historical_data.ticker + '''</button>''')
+                f.write('''<div class="panel">''')
                 f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
+                f.write('''</div>''')
 
             text_image = (
                 f"#{historical_data.ticker} "
@@ -600,10 +604,9 @@ if __name__ == "__main__":
     file_name = historical_data.user_ticker.file_name
     file_name_mtf = historical_data.user_ticker_mtf.file_name
     file_name_ltf = historical_data.user_ticker_ltf.file_name
-    print("files : ", file_name, file_name_mtf, file_name_ltf)
+
     try:
         result = os.remove('../templates/all_charts.html')
-        print(result)   
         perf = time.perf_counter()
         if os.path.isfile(file_name):  # Check .csv file exists
             print(f"{file_name} downloaded and created.")
